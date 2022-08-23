@@ -8,30 +8,28 @@ namespace Calculator
 {
     internal class Expression
     {
-        public static float Evaluate(String expression)
+        public static double Evaluate(String expression)
         {
-            Stack<float> stack = new Stack<float>();
+            Stack<double> stack = new Stack<double>();
+            stack.Push(0);
             for (int i = 0; i < expression.Length; i++)
             {
-                if (Char.IsDigit(expression[i]))
+                if (Char.IsDigit(expression[i]) || expression[i] == ',')
                 {
                     int startIndex = i;
-                    while (Char.IsDigit(expression[i]))
+                    while (Char.IsDigit(expression[i]) || expression[i] == ',')
                     {
                         i++;
                     }
                     string substr = expression.Substring(startIndex,i-startIndex);
-                    stack.Push(float.Parse(substr));
+                    stack.Push(double.Parse(substr));
                     i--;
                 }
-                else if (expression[i] == '+' ||
-                         expression[i] == '-' ||
-                         expression[i] == '/' ||
-                         expression[i] == '*')
+                else if ("+-/*".Contains(expression[i])) 
                 {
-                    float a = stack.Pop();
-                    float b = stack.Pop();
-                    float res = 0;
+                    double a = stack.Pop();
+                    double b = stack.Pop();
+                    double res = 0;
                     switch (expression[i])
                     {
                         case '+': res = b + a; break;
