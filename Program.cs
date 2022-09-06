@@ -1,11 +1,14 @@
-﻿namespace Calculator
+﻿using System.Globalization;
+
+namespace Calculator
 {
     internal class Program
     {
         private static void Main(string[] args)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Console.WriteLine("Калькулятор обратной польской нотации");
-            Console.WriteLine("пример ввода: (-2 + 2,5) * √4");
+            Console.WriteLine("пример ввода: (-2 + 2.5) * √4");
             Console.WriteLine("введите ваше выражение");
             while (true)
             {

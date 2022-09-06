@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,14 +11,15 @@ namespace Calculator
     {
         public static double Evaluate(String expression)
         {
+            char numberDecimalSeparator = CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator[0];
             Stack<double> stack = new Stack<double>();
             stack.Push(0);
             for (int i = 0; i < expression.Length; i++)
             {
-                if (Char.IsDigit(expression[i]) || expression[i] == ',')
+                if (Char.IsDigit(expression[i]) || expression[i] == numberDecimalSeparator)
                 {
                     int startIndex = i;
-                    while (Char.IsDigit(expression[i]) || expression[i] == ',')
+                    while (Char.IsDigit(expression[i]) || expression[i] == numberDecimalSeparator)
                     {
                         i++;
                     }
