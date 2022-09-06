@@ -13,7 +13,6 @@ namespace Calculator
         {
             char numberDecimalSeparator = CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator[0];
             Stack<double> stack = new Stack<double>();
-            stack.Push(0);
             for (int i = 0; i < expression.Length; i++)
             {
                 if (Char.IsDigit(expression[i]) || expression[i] == numberDecimalSeparator)
@@ -27,7 +26,7 @@ namespace Calculator
                     stack.Push(double.Parse(substr));
                     i--;
                 }
-                else if ("+-/*^√%".Contains(expression[i]))
+                else if ("+/*^%".Contains(expression[i]))
                 {
                     double a = stack.Pop();
                     double b = stack.Pop();
@@ -35,14 +34,23 @@ namespace Calculator
                     switch (expression[i])
                     {
                         case '+': res = b + a; break;
-                        case '-': res = b - a; break;
                         case '*': res = b * a; break;
                         case '/': res = b / a; break;
                         case '^': res = Math.Pow(b, a); break;
                         case '%': res = a * b / 100; break;
+                    }
+                    stack.Push(res);
+                }else if ("-√".Contains(expression[i]))
+                {
+                    double a = stack.Pop();
+                    double res = 0;
+                    switch (expression[i])
+                    {
+                        case '-':
+                            res = -a;
+                            break;
                         case '√':
                             res = Math.Sqrt(a);
-                            stack.Push(b);
                             break;
                     }
                     stack.Push(res);
@@ -53,11 +61,16 @@ namespace Calculator
 
         public static string ConvertToRPN(string input)
         {
+            input = input.Replace(" ", "");
+            input = input.Replace("--", "+");
+
             string output = string.Empty;
             Stack<char> operStack = new Stack<char>(); 
 
             for (int i = 0; i < input.Length; i++) 
             {
+                
+
                 if (IsDelimeter(input[i]))
                     continue; 
                 
@@ -77,6 +90,26 @@ namespace Calculator
 
                 if (IsOperator(input[i]))
                 {
+                    // замена '-' на '+ -' где необходимо
+                    if (input[i] == '-')
+                    {
+                        for (int j = i - 1; j >= 0; j--)
+                        {
+                            if ("+-/*^√%".IndexOf(input[j]) != -1)
+                            {
+                                break;
+                            }
+                            else if (Char.IsDigit(input[j]))
+                            {
+                                if (operStack.Count > 0)
+                                    if (GetPriority('+') <= GetPriority(operStack.Peek()))
+                                        output += operStack.Pop().ToString() + " ";
+                                operStack.Push('+');
+                            }
+                        }
+                    }
+
+
                     if (input[i] == '(') 
                         operStack.Push(input[i]); 
                     else if (input[i] == ')') 
@@ -92,11 +125,10 @@ namespace Calculator
                     }
                     else 
                     {
-                        if (operStack.Count > 0) 
+                        if (operStack.Count > 0)
                             if (GetPriority(input[i]) <= GetPriority(operStack.Peek()))
                                 output += operStack.Pop().ToString() + " ";
-                        operStack.Push(char.Parse(input[i].ToString())); 
-
+                        operStack.Push(char.Parse(input[i].ToString()));
                     }
                 }
             }
@@ -112,12 +144,12 @@ namespace Calculator
                 case '(': return 0;
                 case ')': return 1;
                 case '+': return 2;
-                case '-': return 3;
-                case '*': return 4;
-                case '/': return 4;
-                case '√': return 5;
-                case '^': return 5;
-                default: return 6;
+                case '*': return 3;
+                case '/': return 3;
+                case '^': return 4;
+                case '-': return 5;
+                case '√': return 6;
+                default: return 7;
             }
         }
 
